@@ -160,14 +160,19 @@ function isHumanInteractionLocked() {
 }
 
 function rememberPosition() {
+  // Geen herhalingsdetectie tijdens de plaatsfase
+  if (isPlacementPhase()) return;
+
+  // Alleen automatische detectie als beide spelers AI zijn
+  if (!(isAIPlayer(1) && isAIPlayer(2))) return;
+
   const key = serializeState(board, placed, currentPlayer);
   const count = (repetitionCounts.get(key) || 0) + 1;
   repetitionCounts.set(key, count);
   moveHistory.push(key);
 
-  // 3-fold repetition => draw
-  if (count >= 3 && !gameOver) {
-    showDrawPopup("Remise door herhaling.");
+  if (count >= 6 && !gameOver) {
+    showDrawPopup("Gelijkspel door herhaling.");
   }
 }
 
@@ -289,7 +294,7 @@ function showWinPopup(player) {
   winModal.classList.remove("hidden");
 }
 
-function showDrawPopup(message = "Remise.") {
+function showDrawPopup(message = "Gelijkspel.") {
   gameOver = true;
   clearAITimers();
   setAIThinking(false);
@@ -789,7 +794,7 @@ function runAITurn() {
 
   const possibleMoves = getValidMovesFromState(board, placed, currentPlayer);
   if (possibleMoves.length === 0) {
-    showDrawPopup("Remise: geen geldige zetten.");
+    showDrawPopup("Gelijkspel: geen geldige zetten.");
     return;
   }
 
