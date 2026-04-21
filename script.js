@@ -52,6 +52,7 @@ let aiThinking = false;
 let aiTimerIds = [];
 let moveHistory = [];
 let repetitionCounts = new Map();
+let isPaused = false;
 
 // =========================
 // DOM
@@ -66,6 +67,7 @@ const countP1 = document.getElementById("countP1");
 const countP2 = document.getElementById("countP2");
 const toggleHintsBtn = document.getElementById("toggleHintsBtn");
 const resetBtn = document.getElementById("resetBtn");
+const pauseBtn = document.getElementById("pauseBtn");
 
 const player1ModeSelect = document.getElementById("player1ModeSelect");
 const player2ModeSelect = document.getElementById("player2ModeSelect");
@@ -463,6 +465,8 @@ function applySettingsFromUI() {
 }
 
 function resetGame() {
+  isPaused = false;
+  pauseBtn.textContent = "Pauzeer";
   applySettingsFromUI();
   clearAITimers();
   setAIThinking(false);
@@ -779,7 +783,7 @@ function executeAIMove(move) {
 }
 
 function runAITurn() {
-  if (gameOver) return;
+  if (gameOver || isPaused) return;
   if (!isAIPlayer(currentPlayer)) return;
   if (aiThinking) return;
 
@@ -805,7 +809,7 @@ function runAITurn() {
 }
 
 function queueAITurn() {
-  if (gameOver) return;
+  if (gameOver || isPaused) return;
   if (!isAIPlayer(currentPlayer)) return;
 
   clearAITimers();
@@ -853,4 +857,17 @@ window.addEventListener("load", () => {
 window.addEventListener("resize", () => {
   createHoles();
   repositionPieces();
+});
+
+pauseBtn.addEventListener("click", () => {
+  isPaused = !isPaused;
+
+  if (isPaused) {
+    pauseBtn.textContent = "Hervatten";
+    clearAITimers();       // stopt AI meteen
+    setAIThinking(false);  // verberg "AI denkt..."
+  } else {
+    pauseBtn.textContent = "Pauzeer";
+    queueAITurn();         // start AI weer
+  }
 });
