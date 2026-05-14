@@ -31,6 +31,7 @@
         <div class="status-card">
           <span class="label">Beurt</span>
           <div id="turnText" class="value player-1">Speler 1 legt een steen</div>
+          <div id="aiThinkingText" class="thinking-text hidden">AI denkt na…</div>
         </div>
 
         <div class="status-card small">
@@ -40,8 +41,47 @@
             <div>Speler 2 stenen op bord: <strong id="countP2Board">0</strong></div>
           </div>
         </div>
+
+        <div class="status-card small">
+          <span class="label">Spelmodus</span>
+          <div class="controls-grid">
+            <label class="control-field">
+              <span>Speler 1</span>
+              <select id="player1ModeSelect">
+                <option value="human">Mens</option>
+                <option value="ai">AI</option>
+              </select>
+            </label>
+            <label class="control-field">
+              <span>Speler 2</span>
+              <select id="player2ModeSelect">
+                <option value="human">Mens</option>
+                <option value="ai">AI</option>
+              </select>
+            </label>
+            <label class="control-field">
+              <span>AI niveau speler 1</span>
+              <select id="player1LevelSelect">
+                <option value="beginner">Beginner</option>
+                <option value="advanced">Gevorderd</option>
+                <option value="pro">Pro</option>
+              </select>
+            </label>
+            <label class="control-field">
+              <span>AI niveau speler 2</span>
+              <select id="player2LevelSelect">
+                <option value="beginner">Beginner</option>
+                <option value="advanced">Gevorderd</option>
+                <option value="pro">Pro</option>
+              </select>
+            </label>
+          </div>
+          <p class="settings-note">Reset het spel na het wijzigen van de modus om met de nieuwe instellingen te starten.</p>
+        </div>
+
+        <button id="pauseBtn" class="reset-btn">Pauzeer</button>
+        <button id="resetBtn" class="reset-btn">Reset spel</button>        
         <button id="toggleHintsBtn" class="reset-btn">Zet hints uit</button>
-        <button id="resetBtn" class="reset-btn">Reset spel</button>
       </aside>
 
       <section class="board-panel">
