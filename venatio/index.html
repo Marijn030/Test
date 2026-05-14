@@ -57,8 +57,26 @@
             <div>Speler 2 als jager: <strong id="scoreB">—</strong></div>
           </div>
         </div>
-        <button id="toggleHintsBtn" class="reset-btn">Zet hints uit</button>
+
+
+        <div class="status-card small">
+          <span class="label">Spelmodus</span>
+          <div class="controls-grid">
+            <label class="control-field">
+              <span>Kies tegenstander</span>
+              <select id="gameModeSelect">
+                <option value="pvp">Speler tegen speler</option>
+                <option value="ai-hunter">AI speelt jager</option>
+                <option value="ai-prey">AI speelt prooi</option>
+                <option value="ai-both">AI tegen AI</option>
+              </select>
+            </label>
+          </div>
+          <p id="aiThinking" class="thinking-text hidden">AI denkt na…</p>
+          <p class="settings-note">De instelling blijft actief wanneer ronde 2 start en de rollen wisselen.</p>
+        </div>
         <button id="resetBtn" class="reset-btn">Hele wedstrijd resetten</button>
+        <button id="toggleHintsBtn" class="reset-btn">Zet hints uit</button>
       </aside>
 
       <section class="board-panel">

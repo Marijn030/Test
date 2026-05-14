@@ -121,10 +121,58 @@ body {
   text-shadow: 0 0 6px rgba(0,0,0,0.6);
 }
 
+.thinking-text {
+  margin: 10px 0 0;
+  font-size: 0.95rem;
+  color: #ead9bb;
+}
+
+.hidden {
+  display: none !important;
+}
+
 .stone-counts {
   display: grid;
   gap: 8px;
   color: #f5ead8;
+}
+
+.controls-grid {
+  display: grid;
+  gap: 12px;
+}
+
+.control-field {
+  display: grid;
+  gap: 6px;
+  color: #f5ead8;
+  font-size: 0.95rem;
+}
+
+.control-field span {
+  color: #f5ead8;
+  font-weight: 700;
+}
+
+.control-field select {
+  width: 100%;
+  border: 1px solid rgba(255, 233, 186, 0.18);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: rgba(255, 248, 234, 0.1);
+  color: #fff6e7;
+  font-size: 0.95rem;
+}
+
+.control-field option {
+  color: #24170f;
+}
+
+.settings-note {
+  margin: 12px 0 0;
+  color: #d8c7a5;
+  font-size: 0.88rem;
+  line-height: 1.4;
 }
 
 .reset-btn,
@@ -234,6 +282,13 @@ body {
 
 .piece.selected {
   transform: translate(-50%, -50%) scale(1.22);
+  filter:
+    drop-shadow(0 0 0.35rem rgba(255, 240, 180, 0.85))
+    drop-shadow(0 8px 14px rgba(0,0,0,0.45));
+}
+
+.piece.ai-preview {
+  transform: translate(-50%, -50%) scale(1.16);
   filter:
     drop-shadow(0 0 0.35rem rgba(255, 240, 180, 0.85))
     drop-shadow(0 8px 14px rgba(0,0,0,0.45));

@@ -54,6 +54,8 @@ let selected = null;
 let gameOver = false;
 let hunterMoveCount = 0;
 let hintsEnabled = true;
+let gameMode = "pvp";
+let aiTurnTimer = null;
 
 let round = 1;
 let hunterOwner = "1"; // round 1: 1 hunts, round 2: 2 hunts
@@ -75,6 +77,8 @@ const trappedPreyCount = document.getElementById("trappedPreyCount");
 const scoreA = document.getElementById("scoreA");
 const scoreB = document.getElementById("scoreB");
 const toggleHintsBtn = document.getElementById("toggleHintsBtn");
+const gameModeSelect = document.getElementById("gameModeSelect");
+const aiThinking = document.getElementById("aiThinking");
 const resetBtn = document.getElementById("resetBtn");
 
 const roundModal = document.getElementById("roundModal");
@@ -143,6 +147,165 @@ function countFreePrey() {
   return total;
 }
 
+function getPlayerOwner(player) {
+  if (player === HUNTER) return hunterOwner;
+  return hunterOwner === "1" ? "2" : "1";
+}
+
+function isAiPlayer(player) {
+  if (gameMode === "ai-both") return true;
+  if (gameMode === "ai-hunter") return player === HUNTER;
+  if (gameMode === "ai-prey") return player === PREY;
+  return false;
+}
+
+function setAiThinking(isThinking) {
+  if (!aiThinking) return;
+  aiThinking.classList.toggle("hidden", !isThinking);
+}
+
+function getAllLegalMoves(player, boardState = board) {
+  const moves = [];
+
+  for (let from = 0; from < boardState.length; from++) {
+    if (boardState[from] !== player) continue;
+    if (player === PREY && isTrappedPreyOnBoard(from, boardState)) continue;
+
+    connections[from].forEach(to => {
+      if (boardState[to] === null) moves.push({ from, to });
+    });
+  }
+
+  return moves;
+}
+
+function isTrappedPreyOnBoard(index, boardState) {
+  if (boardState[index] !== PREY) return false;
+  return connections[index].every(next => boardState[next] !== null);
+}
+
+function countTrappedPreyOnBoard(boardState) {
+  let total = 0;
+  for (let i = 0; i < boardState.length; i++) {
+    if (isTrappedPreyOnBoard(i, boardState)) total++;
+  }
+  return total;
+}
+
+function getPreyMobility(boardState) {
+  return getAllLegalMoves(PREY, boardState).length;
+}
+
+function getHunterPressure(boardState) {
+  let pressure = 0;
+  const preyPositions = [];
+  const hunterPositions = [];
+
+  boardState.forEach((player, index) => {
+    if (player === PREY) preyPositions.push(index);
+    if (player === HUNTER) hunterPositions.push(index);
+  });
+
+  preyPositions.forEach(preyIndex => {
+    hunterPositions.forEach(hunterIndex => {
+      if (connections[preyIndex].includes(hunterIndex)) pressure++;
+    });
+  });
+
+  return pressure;
+}
+
+function simulateMove(move, player, boardState = board) {
+  const nextBoard = [...boardState];
+  nextBoard[move.from] = null;
+  nextBoard[move.to] = player;
+  return nextBoard;
+}
+
+function evaluateHunterMove(move) {
+  const nextBoard = simulateMove(move, HUNTER);
+  return (
+    countTrappedPreyOnBoard(nextBoard) * 1000 +
+    getHunterPressure(nextBoard) * 20 -
+    getPreyMobility(nextBoard) * 25 +
+    Math.random()
+  );
+}
+
+function evaluatePreyMove(move) {
+  const nextBoard = simulateMove(move, PREY);
+  return (
+    getPreyMobility(nextBoard) * 30 -
+    countTrappedPreyOnBoard(nextBoard) * 1000 -
+    getHunterPressure(nextBoard) * 18 +
+    Math.random()
+  );
+}
+
+function chooseAiMove(player) {
+  const moves = getAllLegalMoves(player);
+  if (moves.length === 0) return null;
+
+  const evaluate = player === HUNTER ? evaluateHunterMove : evaluatePreyMove;
+  return moves.reduce((best, move) => {
+    return evaluate(move) > evaluate(best) ? move : best;
+  }, moves[0]);
+}
+
+function getPieceAt(index) {
+  return document.querySelector(`.piece[data-index="${index}"]`);
+}
+
+function clearAiPreview() {
+  document.querySelectorAll(".piece.ai-preview").forEach(piece => {
+    piece.classList.remove("ai-preview");
+  });
+}
+
+function maybeRunAiTurn() {
+  window.clearTimeout(aiTurnTimer);
+  clearAiPreview();
+
+  if (gameOver || !isAiPlayer(currentPlayer)) {
+    setAiThinking(false);
+    return;
+  }
+
+  setAiThinking(true);
+  aiTurnTimer = window.setTimeout(() => {
+    runAiTurn();
+  }, 450);
+}
+
+function runAiTurn() {
+  if (gameOver || !isAiPlayer(currentPlayer)) {
+    setAiThinking(false);
+    return;
+  }
+
+  const move = chooseAiMove(currentPlayer);
+  if (!move) {
+    setAiThinking(false);
+    return;
+  }
+
+  const piece = getPieceAt(move.from);
+  if (!piece) {
+    setAiThinking(false);
+    return;
+  }
+
+  clearSelection();
+  piece.classList.add("ai-preview");
+
+  window.setTimeout(() => {
+    piece.classList.remove("ai-preview");
+    selected = { el: piece, from: move.from };
+    handleHoleClick(move.to, true);
+    setAiThinking(false);
+  }, 350);
+}
+
 function refreshPieceStates() {
   document.querySelectorAll(".piece").forEach(piece => {
     const index = Number(piece.dataset.index);
@@ -190,8 +353,10 @@ function updateStatus() {
   }
 
   if (!selected) {
+    const owner = getPlayerOwner(currentPlayer);
+    const aiLabel = isAiPlayer(currentPlayer) ? "AI" : `Speler ${owner}`;
     turnText.textContent =
-      `${currentPlayer === HUNTER ? "Jager" : "Prooi"} (${currentPlayer === HUNTER ? "zwart" : "wit"}) is aan zet`;
+      `${currentPlayer === HUNTER ? "Jager" : "Prooi"} (${currentPlayer === HUNTER ? "zwart" : "wit"}) is aan zet — ${aiLabel}`;
   } else {
     turnText.textContent =
       `${currentPlayer === HUNTER ? "Jager" : "Prooi"}: kies een aangrenzend leeg kruispunt`;
@@ -217,6 +382,7 @@ function switchPlayer() {
   refreshPieceStates();
   refreshHoles();
   updateStatus();
+  maybeRunAiTurn();
 }
 
 function createPiece(player, index) {
@@ -232,6 +398,7 @@ function createPiece(player, index) {
     event.stopPropagation();
 
     if (gameOver) return;
+    if (isAiPlayer(currentPlayer)) return;
     if (player !== currentPlayer) return;
     if (player === PREY && isTrappedPrey(Number(el.dataset.index))) return;
 
@@ -258,8 +425,9 @@ function createPiece(player, index) {
   piecesContainer.appendChild(el);
 }
 
-function handleHoleClick(index) {
+function handleHoleClick(index, fromAi = false) {
   if (gameOver) return;
+  if (!fromAi && isAiPlayer(currentPlayer)) return;
   if (!selected) return;
   if (board[index] !== null) return;
   if (!connections[selected.from].includes(index)) return;
@@ -372,6 +540,9 @@ function repositionPieces() {
 }
 
 function resetBoardForRound() {
+  window.clearTimeout(aiTurnTimer);
+  setAiThinking(false);
+  clearAiPreview();
   board = [...START_BOARD];
   currentPlayer = HUNTER;
   selected = null;
@@ -381,6 +552,7 @@ function resetBoardForRound() {
   createHoles();
   createAllPieces();
   updateStatus();
+  maybeRunAiTurn();
 }
 
 function resetMatch() {
@@ -398,12 +570,21 @@ window.addEventListener("load", () => {
   createHoles();
   createAllPieces();
   updateStatus();
+  maybeRunAiTurn();
 });
 
 window.addEventListener("resize", () => {
   createHoles();
   repositionPieces();
   refreshPieceStates();
+});
+
+gameModeSelect.addEventListener("change", () => {
+  gameMode = gameModeSelect.value;
+  clearSelection();
+  refreshHoles();
+  updateStatus();
+  maybeRunAiTurn();
 });
 
 toggleHintsBtn.addEventListener("click", () => {
