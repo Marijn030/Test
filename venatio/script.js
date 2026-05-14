@@ -274,7 +274,7 @@ function maybeRunAiTurn() {
   setAiThinking(true);
   aiTurnTimer = window.setTimeout(() => {
     runAiTurn();
-  }, 450);
+  }, 1200);
 }
 
 function runAiTurn() {
