@@ -47,7 +47,7 @@ let gameMode = {
   p2: { type: "human", level: "beginner" }
 };
 
-let aiDelay = 800;
+let aiDelay = 1200;
 let aiThinking = false;
 let aiTimerIds = [];
 let moveHistory = [];
@@ -73,7 +73,6 @@ const player1ModeSelect = document.getElementById("player1ModeSelect");
 const player2ModeSelect = document.getElementById("player2ModeSelect");
 const player1LevelSelect = document.getElementById("player1LevelSelect");
 const player2LevelSelect = document.getElementById("player2LevelSelect");
-const aiDelaySelect = document.getElementById("aiDelaySelect");
 
 const winModal = document.getElementById("winModal");
 const winMessage = document.getElementById("winMessage");
@@ -465,8 +464,6 @@ function applySettingsFromUI() {
 
   gameMode.p1.level = player1LevelSelect?.value || "beginner";
   gameMode.p2.level = player2LevelSelect?.value || "beginner";
-
-  aiDelay = Number(aiDelaySelect?.value || 800);
 }
 
 function resetGame() {
@@ -849,7 +846,6 @@ player1ModeSelect?.addEventListener("change", applySettingsFromUI);
 player2ModeSelect?.addEventListener("change", applySettingsFromUI);
 player1LevelSelect?.addEventListener("change", applySettingsFromUI);
 player2LevelSelect?.addEventListener("change", applySettingsFromUI);
-aiDelaySelect?.addEventListener("change", applySettingsFromUI);
 
 window.addEventListener("load", () => {
   applySettingsFromUI();
