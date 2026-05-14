@@ -43,6 +43,23 @@
           </p>
         </div>
 
+        <div class="status-card small">
+          <span class="label">Spelmodus</span>
+          <div class="controls-grid">
+            <label class="control-field">
+              <span>Tegenstander</span>
+              <select id="gameModeSelect">
+                <option value="pvp">Speler tegen speler</option>
+                <option value="ai-p2">Speler 1 tegen AI</option>
+                <option value="ai-p1">AI tegen Speler 2</option>
+                <option value="ai-both">AI tegen AI</option>
+              </select>
+            </label>
+          </div>
+          <p id="aiThinking" class="thinking-text hidden">AI denkt na…</p>
+          <p class="settings-note">De AI werkt in zowel de plaatsfase als de verplaatsfase.</p>
+        </div>
+
         <div class="status-card">
           <span class="label">Beurt</span>
           <div id="turnText" class="value">Selecteer Piso of Seneca om te starten</div>
@@ -59,8 +76,8 @@
             <div>Inciti zwart: <strong id="countP2Inciti">0</strong></div>
           </div>
         </div>
-        <button id="toggleHintsBtn" class="reset-btn">Zet hints uit</button>
         <button id="resetBtn" class="reset-btn">Reset spel</button>
+        <button id="toggleHintsBtn" class="reset-btn">Zet hints uit</button>
       </aside>
 
       <section class="board-panel">
