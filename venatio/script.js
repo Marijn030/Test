@@ -355,8 +355,9 @@ function updateStatus() {
   if (!selected) {
     const owner = getPlayerOwner(currentPlayer);
     const aiLabel = isAiPlayer(currentPlayer) ? "AI" : `Speler ${owner}`;
+    const color = owner === "1" ? "wit" : "zwart";
     turnText.textContent =
-      `${currentPlayer === HUNTER ? "Jager" : "Prooi"} (${currentPlayer === HUNTER ? "zwart" : "wit"}) is aan zet — ${aiLabel}`;
+      `${currentPlayer === HUNTER ? "Jager" : "Prooi"} (${color}) is aan zet — ${aiLabel}`;
   } else {
     turnText.textContent =
       `${currentPlayer === HUNTER ? "Jager" : "Prooi"}: kies een aangrenzend leeg kruispunt`;
@@ -387,7 +388,11 @@ function switchPlayer() {
 
 function createPiece(player, index) {
   const el = document.createElement("img");
-  el.src = player === PREY ? "stone1.png" : "stone2.png";
+  const owner = getPlayerOwner(player);
+  el.src =
+    owner === "1"
+      ? "stone1.png"   // Player 1 = white
+      : "stone2.png";  // Player 2 = black
   el.className = "piece";
   el.dataset.player = String(player);
   el.draggable = false;
