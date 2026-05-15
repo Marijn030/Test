@@ -335,6 +335,7 @@ function refreshHoles() {
 
 function updateStatus() {
   roundText.textContent = `Ronde ${round} van 2`;
+
   rolesText.textContent =
     hunterOwner === "1"
       ? "Speler 1 = Jager, Speler 2 = Prooi"
@@ -343,6 +344,7 @@ function updateStatus() {
   hunterMoves.textContent = hunterMoveCount;
   freePreyCount.textContent = countFreePrey();
   trappedPreyCount.textContent = countTrappedPrey();
+
   scoreA.textContent = scores[1] === null ? "—" : scores[1];
   scoreB.textContent = scores[2] === null ? "—" : scores[2];
 
@@ -352,10 +354,18 @@ function updateStatus() {
     return;
   }
 
+  // Who owns the current hunter/prey piece?
+  const owner = getPlayerOwner(currentPlayer);
+
+  const aiLabel = isAiPlayer(currentPlayer)
+    ? "AI"
+    : `Speler ${owner}`;
+
+  const color = owner === "1"
+    ? "wit"
+    : "zwart";
+
   if (!selected) {
-    const owner = getPlayerOwner(currentPlayer);
-    const aiLabel = isAiPlayer(currentPlayer) ? "AI" : `Speler ${owner}`;
-    const color = owner === "1" ? "wit" : "zwart";
     turnText.textContent =
       `${currentPlayer === HUNTER ? "Jager" : "Prooi"} (${color}) is aan zet — ${aiLabel}`;
   } else {
@@ -363,7 +373,7 @@ function updateStatus() {
       `${currentPlayer === HUNTER ? "Jager" : "Prooi"}: kies een aangrenzend leeg kruispunt`;
   }
 
-  const owner = getPieceOwner(currentPlayer);
+  // Text color follows player number, not piece type
   turnText.className = `value player-${owner}`;
 }
 
